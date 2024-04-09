@@ -14,7 +14,6 @@ let cart = [];
 // Abrir o modal do carrinho
 cartBtn.addEventListener("click", function () {
     updateCartModel();
-    cartModal.style.display = "flex"
     const isOpen = checkRestaurantOpen();
     if (!isOpen) {
         Toastify({
@@ -31,6 +30,9 @@ cartBtn.addEventListener("click", function () {
 
         return;
     }
+
+    cartModal.style.display = "flex"
+
 
 })
 
@@ -75,6 +77,20 @@ function addToCart(nome, preco) {
     }
 
     updateCartModel();
+
+    Toastify({
+        text: "Item adicionado com sucesso",
+        duration: 800,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "center", // `left`, `center` or `right`
+        stopOnFocus: false, // Prevents dismissing of toast on hover
+        style: {
+            background: "#00cd00", //#16a34a
+        },
+    }).showToast();
+
+    return;
 
 }
 

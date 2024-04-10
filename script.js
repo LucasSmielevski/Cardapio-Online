@@ -8,28 +8,13 @@ const closeModalBtn = document.getElementById("close-modal-btn")
 const cartCounter = document.getElementById("cart-count")
 const addressInput = document.getElementById("endereco")
 const addressWarn = document.getElementById("endereco-warn")
+const msgClose = document.getElementById("msg-close")
 
 let cart = [];
 
 // Abrir o modal do carrinho
 cartBtn.addEventListener("click", function () {
     updateCartModel();
-    const isOpen = checkRestaurantOpen();
-    if (!isOpen) {
-        Toastify({
-            text: "O restaurante está fechado",
-            duration: 2000,
-            close: true,
-            gravity: "top", // `top` or `bottom`
-            position: "center", // `left`, `center` or `right`
-            stopOnFocus: true, // Prevents dismissing of toast on hover
-            style: {
-                background: "#ef4444",
-            },
-        }).showToast();
-
-        return;
-    }
 
     cartModal.style.display = "flex"
 
@@ -49,6 +34,24 @@ closeModalBtn.addEventListener("click", function () {
 
 menu.addEventListener("click", function (event) {
     let parentButton = event.target.closest(".add-to-card-btn")
+
+    const isOpen = checkRestaurantOpen();
+    if (!isOpen) {
+        Toastify({
+            text: "O restaurante está fechado",
+            duration: 2000,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "center", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+                background: "#ef4444",
+            },
+        }).showToast();
+
+        return;
+    }
+
 
     if (parentButton) {
         const nome = parentButton.getAttribute("data-name")
@@ -170,6 +173,7 @@ addressInput.addEventListener("input", function (event) {
 })
 
 finalizarBtn.addEventListener("click", function () {
+    let total = 0
 
     if (!isOpen) {
         Toastify({
@@ -196,14 +200,15 @@ finalizarBtn.addEventListener("click", function () {
 
     //Enviar o pedido para api do WhatsApp
     const cartItems = cart.map((item) => {
+        total += item.quantidade * item.preco;
         return (
-            ` ${item.nome} Quantidade: (${item.quantidade}) Preço: R$${item.preco} |`
+            ` ${item.nome} Quantidade: (${item.quantidade}) \nPreço: R$${item.preco} |\n`
         )
     }).join("")
     const message = encodeURIComponent(cartItems)
     const phone = "48991634186"
 
-    window.open(`https://wa.me/${phone}?text=${message} Endereço: ${addressInput.value}`, "_blank")
+    window.open(`https://wa.me/${phone}?text=${message}\n Valor Total: R$${total}--- Endereço: ${addressInput.value}`, "_blank")
 
     cart = [];
     updateCartModel();
@@ -217,8 +222,14 @@ function checkRestaurantOpen() {
     return hora >= 18 && hora < 22;
 }
 
+
 const spanItem = document.getElementById("data-span")
 const isOpen = checkRestaurantOpen();
+
+//Adicionar mensagem de loja fechada
+if (!isOpen) {
+    msgClose.classList.remove("hidden")
+}
 
 if (isOpen) {
     spanItem.classList.remove("bg-red-500");
